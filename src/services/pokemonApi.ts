@@ -7,6 +7,13 @@ export interface PokemonDetails {
     slot: number;
     type: { name: string; url: string };
   }[];
+  sprites: {
+    other: {
+      "official-artwork": {
+        front_default: string;
+      };
+    };
+  };
 }
 
 export const pokemonApi = createApi({
@@ -14,19 +21,8 @@ export const pokemonApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: "https://pokeapi.co/api/v2/" }),
   endpoints: (builder) => ({
     getPokemons: builder.query({
-      query: ({ limit = 151 }) => `pokemon?limit=${limit}&offset=0`,
-      transformResponse: ({ results }) => {
-        return results.map((p: { name: string; url: string }) => {
-          const splitUrl = p.url.split("/");
-          const id = splitUrl[splitUrl.length - 2];
-
-          return {
-            name: p.name,
-            id,
-            image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`,
-          };
-        });
-      },
+      query: ({ limit = 20, offset = 0 }) =>
+        `pokemon?limit=${limit}&offset=${offset}`,
     }),
 
     getPokemonDetails: builder.query<PokemonDetails, string>({
