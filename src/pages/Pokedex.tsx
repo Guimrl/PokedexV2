@@ -6,6 +6,7 @@ import {
   faStar,
   faChevronLeft,
   faChevronRight,
+  faWandMagic,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   AppContainer,
@@ -28,12 +29,14 @@ import {
 import { useFavorites } from "../hooks/useFavorites";
 import PokemonCard from "./PokemonCard";
 
-const App = () => {
+const Pokedex = () => {
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(20);
   const [search, setSearch] = useState("");
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [pageInput, setPageInput] = useState(String(page + 1));
+
+  const [viewLegacy, setViewLegacy] = useState(false);
 
   const { favorites, toggleFavorite } = useFavorites();
 
@@ -102,6 +105,13 @@ const App = () => {
               aria-hidden="true"
             />
           </FavoritesButton>
+
+          <FavoritesButton
+            onClick={() => setViewLegacy((s) => !s)}
+            aria-label="Mudar visualizaçao"
+          >
+            <FontAwesomeIcon icon={faWandMagic} aria-hidden="true" />
+          </FavoritesButton>
         </SearchContainer>
       </Header>
       <Main>
@@ -114,6 +124,7 @@ const App = () => {
                   favorites={favorites}
                   toggleFavorite={toggleFavorite}
                   showFavoritesOnly={showFavoritesOnly}
+                  viewLegacy={viewLegacy}
                 />
               ))
             : filteredPokemons?.map((poke: { name: string }) => (
@@ -123,6 +134,7 @@ const App = () => {
                   favorites={favorites}
                   toggleFavorite={toggleFavorite}
                   showFavoritesOnly={showFavoritesOnly}
+                  viewLegacy={viewLegacy}
                 />
               ))}
         </PokemonGrid>
@@ -206,4 +218,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Pokedex;

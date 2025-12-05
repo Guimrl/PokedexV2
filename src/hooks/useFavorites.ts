@@ -18,7 +18,7 @@ export const useFavorites = () => {
   const toggleFavorite = useCallback((id: number) => {
     setFavorites((prev) => {
       const newFavorites = prev.includes(id)
-        ? prev.filter((id) => id !== id)
+        ? prev.filter((favId) => favId !== id)
         : [...prev, id];
 
       localStorage.setItem(FAVORITES_KEY, JSON.stringify(newFavorites));

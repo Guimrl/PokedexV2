@@ -2,12 +2,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useGetPokemonDetailsQuery } from "../services/pokemonApi";
 import { faStar } from "@fortawesome/free-solid-svg-icons/faStar";
 import { typeColors } from "../utils/typeColors";
+import { useNavigate } from "react-router-dom";
 
 interface PokemonCardProps {
   pokemonIdentifier: string | number;
   favorites: number[];
   toggleFavorite: (id: number) => void;
   showFavoritesOnly: boolean;
+  viewLegacy: boolean;
 }
 
 const PokemonCard = ({
@@ -15,7 +17,10 @@ const PokemonCard = ({
   favorites,
   toggleFavorite,
   showFavoritesOnly,
+  viewLegacy,
 }: PokemonCardProps) => {
+  const navigate = useNavigate();
+
   const { data } = useGetPokemonDetailsQuery(String(pokemonIdentifier));
 
   if (!data) return null;
@@ -50,12 +55,17 @@ const PokemonCard = ({
       </div>
 
       <img
-        src={data.sprites.other["official-artwork"].front_default}
-        // src={data.sprites.front_default}
+        src={
+          viewLegacy
+            ? data?.sprites.front_default
+            : data?.sprites.other["official-artwork"].front_default
+        }
+        onClick={() => navigate(`/pokemon/${data.id}`)}
         alt={data.name}
         width={150}
         height={150}
         loading="lazy"
+        style={{ cursor: "pointer" }}
       />
 
       <p style={styles.name}>{data.name}</p>
