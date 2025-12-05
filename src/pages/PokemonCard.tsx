@@ -2,7 +2,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useGetPokemonDetailsQuery } from "../services/pokemonApi";
 import { faStar } from "@fortawesome/free-solid-svg-icons/faStar";
 import { typeColors } from "../utils/typeColors";
-import pokeballHandle from "../assets/pokeball_handle.webp";
 
 interface PokemonCardProps {
   pokemonIdentifier: string | number;
@@ -17,20 +16,11 @@ const PokemonCard = ({
   toggleFavorite,
   showFavoritesOnly,
 }: PokemonCardProps) => {
-  const { data, isLoading } = useGetPokemonDetailsQuery(
-    String(pokemonIdentifier)
-  );
+  const { data } = useGetPokemonDetailsQuery(String(pokemonIdentifier));
 
-  if (isLoading) return;
-  <img
-    src={pokeballHandle}
-    style={styles.cardLoading}
-    width={150}
-    height={150}
-    loading="lazy"
-  />;
   if (!data) return null;
   if (showFavoritesOnly && !favorites.includes(data.id)) return null;
+
   return (
     <div style={styles.card}>
       <div
@@ -55,8 +45,10 @@ const PokemonCard = ({
               ? { color: "#ffc300", cursor: "pointer" }
               : { color: "#ddd", cursor: "pointer" }
           }
+          aria-hidden="true"
         />
       </div>
+
       <img
         src={data.sprites.other["official-artwork"].front_default}
         // src={data.sprites.front_default}
@@ -74,6 +66,7 @@ const PokemonCard = ({
             key={t.type.name}
             style={{
               ...styles.typeBadge,
+
               backgroundColor: typeColors[t.type.name] || "#555",
             }}
           >
@@ -96,12 +89,8 @@ const styles = {
     flexDirection: "column" as const,
     alignItems: "center",
     gap: "5px",
-    minWidth: "150px",
-    minHeight: "220px",
   },
   cardLoading: {
-    width: "150px",
-    height: "200px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -116,18 +105,19 @@ const styles = {
   types: {
     padding: "5px",
     display: "flex",
-    gap: "25px",
-    marginTop: "5px",
+    gap: "20px",
+    margin: "5px",
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
     flexWrap: "wrap" as const,
   },
   typeBadge: {
-    fontSize: "0.7em",
-    padding: "2px 8px",
+    fontSize: "0.8em",
+    padding: "4px 10px",
     borderRadius: "10px",
-    color: "white",
+    color: "#242424",
+    fontWeight: "bold",
     textTransform: "capitalize" as const,
   },
 };

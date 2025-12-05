@@ -83,16 +83,23 @@ const App = () => {
           <Logo src={pokeballImage} alt="Pokeball" />
         </LogoContainer>
         <SearchContainer>
+          <label htmlFor="search" className="sr-only">
+            Buscar Pokémon
+          </label>
           <SearchInput
             type="text"
             placeholder="Procurar Pokémon..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <FavoritesButton onClick={() => setShowFavoritesOnly((s) => !s)}>
+          <FavoritesButton
+            onClick={() => setShowFavoritesOnly((s) => !s)}
+            aria-label="Ir para favoritos"
+          >
             <FontAwesomeIcon
               icon={faStar}
               color={showFavoritesOnly ? "#ffc300" : "#ddd"}
+              aria-hidden="true"
             />
           </FavoritesButton>
         </SearchContainer>
@@ -122,9 +129,18 @@ const App = () => {
       </Main>
       <Footer>
         <FooterContent>
-          <FooterSection show={!showFavoritesOnly}>
-            <span>Página</span>
+          <FooterSection
+            style={{
+              visibility: !showFavoritesOnly ? "visible" : "hidden",
+            }}
+          >
+            <span className="hide-mobile">Página</span>
+            <label htmlFor="pageIndex" className="sr-only">
+              Selecione a pagina
+            </label>
+
             <PageInput
+              id={"pageIndex"}
               type="number"
               value={pageInput}
               onChange={handlePageInputChange}
@@ -133,26 +149,51 @@ const App = () => {
               min="1"
               max={totalPages}
             />
-            <span>de {totalPages}</span>
-            <GoButton onClick={handleGoToPage}>Ir</GoButton>
+            <span className="hide-mobile">de {totalPages}</span>
+            <GoButton
+              onClick={handleGoToPage}
+              aria-label="Ir para página"
+              className="hide-mobile"
+            >
+              Ir
+            </GoButton>
           </FooterSection>
-          <FooterSection show={!showFavoritesOnly}>
+          <FooterSection
+            style={{
+              visibility: !showFavoritesOnly ? "visible" : "hidden",
+            }}
+          >
             <NavButton
               onClick={() => setPage((old) => Math.max(0, old - 1))}
               disabled={page === 0}
+              aria-label="Voltar para última página"
             >
-              <FontAwesomeIcon icon={faChevronLeft} />
+              <FontAwesomeIcon icon={faChevronLeft} aria-hidden="true" />
             </NavButton>
             <NavButton
               onClick={() => (!data?.next ? null : setPage((old) => old + 1))}
               disabled={!data?.next}
+              aria-label="Avançar para próxima página"
             >
-              <FontAwesomeIcon icon={faChevronRight} />
+              <FontAwesomeIcon icon={faChevronRight} aria-hidden="true" />
             </NavButton>
           </FooterSection>
-          <FooterSection show={true}>
-            <label style={{ marginRight: "10px" }}>Pokémons por página:</label>
-            <SelectInput value={itemsPerPage} onChange={handleLimitChange}>
+          <FooterSection
+            style={{
+              visibility: !showFavoritesOnly ? "visible" : "hidden",
+            }}
+          >
+            <label style={{ marginRight: "10px" }} className="hide-mobile">
+              Pokémons por página:
+            </label>
+            <label htmlFor="itemsPerPage" className="sr-only">
+              Selecione quantos pokémons por página
+            </label>
+            <SelectInput
+              id="itemsPerPage"
+              value={itemsPerPage}
+              onChange={handleLimitChange}
+            >
               <option value={10}>10</option>
               <option value={20}>20</option>
               <option value={50}>50</option>

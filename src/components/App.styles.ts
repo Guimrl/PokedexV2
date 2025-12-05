@@ -15,15 +15,25 @@ export const Header = styled.header`
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  margin-bottom: 1rem;
 `;
 
 export const Logo = styled.img`
   height: 3.5rem;
   width: 3.5rem;
+
+  @media screen and (max-width: 768px) {
+    height: 2.5rem;
+    width: 2.5rem;
+  }
 `;
 
 export const LogoContainer = styled.div`
   width: 30%;
+
+  @media screen and (max-width: 768px) {
+    width: 20%;
+  }
 `;
 
 export const SearchContainer = styled.div`
@@ -36,6 +46,10 @@ export const SearchInput = styled.input`
   padding: 0.5rem;
   margin-left: 2rem;
   width: 50%;
+
+  @media screen and (max-width: 768px) {
+    width: 140px;
+  }
 `;
 
 export const FavoritesButton = styled.button`
@@ -69,12 +83,11 @@ export const FooterContent = styled.div`
   align-items: center;
 `;
 
-export const FooterSection = styled.div<{ show: boolean }>`
+export const FooterSection = styled.div`
   width: 33%;
   display: flex;
   justify-content: center;
   align-items: center;
-  visibility: ${(props) => (props.show ? "visible" : "hidden")};
 `;
 
 export const PageInput = styled.input`
