@@ -1,11 +1,36 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useGetPokemonDetailsQuery } from "../services/pokemonApi";
+import { faStar } from "@fortawesome/free-solid-svg-icons/faStar";
+import { typeColors } from "../utils/typeColors";
+import pokeballHandle from "../assets/pokeball_handle.webp";
 
-export const PokemonCard = ({ name }: { name: string }) => {
-  const { data, isLoading } = useGetPokemonDetailsQuery(name);
+interface PokemonCardProps {
+  pokemonIdentifier: string | number;
+  favorites: number[];
+  toggleFavorite: (id: number) => void;
+  showFavoritesOnly: boolean;
+}
 
-  if (isLoading) return <div style={styles.cardLoading}>...</div>;
+const PokemonCard = ({
+  pokemonIdentifier,
+  favorites,
+  toggleFavorite,
+  showFavoritesOnly,
+}: PokemonCardProps) => {
+  const { data, isLoading } = useGetPokemonDetailsQuery(
+    String(pokemonIdentifier)
+  );
+
+  if (isLoading) return;
+  <img
+    src={pokeballHandle}
+    style={styles.cardLoading}
+    width={150}
+    height={150}
+    loading="lazy"
+  />;
   if (!data) return null;
-  console.log(data);
+  if (showFavoritesOnly && !favorites.includes(data.id)) return null;
   return (
     <div style={styles.card}>
       <div
@@ -21,20 +46,37 @@ export const PokemonCard = ({ name }: { name: string }) => {
         }}
       >
         <small>#{data.id}</small>
-        <p style={styles.name}>{name}</p>
+
+        <FontAwesomeIcon
+          icon={faStar}
+          onClick={() => toggleFavorite(data.id)}
+          style={
+            favorites.includes(data.id)
+              ? { color: "#ffc300", cursor: "pointer" }
+              : { color: "#ddd", cursor: "pointer" }
+          }
+        />
       </div>
       <img
-        // src={data.sprites.other["official-artwork"].front_default}
-        src={data.sprites.front_default}
-        alt={name}
+        src={data.sprites.other["official-artwork"].front_default}
+        // src={data.sprites.front_default}
+        alt={data.name}
         width={150}
         height={150}
         loading="lazy"
       />
 
+      <p style={styles.name}>{data.name}</p>
+
       <div style={styles.types}>
         {data.types.map((t) => (
-          <span key={t.type.name} style={styles.typeBadge}>
+          <span
+            key={t.type.name}
+            style={{
+              ...styles.typeBadge,
+              backgroundColor: typeColors[t.type.name] || "#555",
+            }}
+          >
             {t.type.name}
           </span>
         ))}
@@ -72,7 +114,6 @@ const styles = {
     margin: "5px 0",
   },
   types: {
-    boxSizing: "border-box",
     padding: "5px",
     display: "flex",
     gap: "25px",
@@ -86,8 +127,9 @@ const styles = {
     fontSize: "0.7em",
     padding: "2px 8px",
     borderRadius: "10px",
-    backgroundColor: "#555",
     color: "white",
     textTransform: "capitalize" as const,
   },
 };
+
+export default PokemonCard;

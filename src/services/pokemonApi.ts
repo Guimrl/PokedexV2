@@ -1,20 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-export interface PokemonDetails {
-  id: number;
-  name: string;
-  types: {
-    slot: number;
-    type: { name: string; url: string };
-  }[];
-  sprites: {
-    other: {
-      "official-artwork": {
-        front_default: string;
-      };
-    };
-  };
-}
+import type { PokemonDetails } from "../interfaces/pokemonDetails";
 
 export const pokemonApi = createApi({
   reducerPath: "pokemonApi",
