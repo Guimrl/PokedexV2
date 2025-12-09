@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useGetPokemonsQuery } from "../services/pokemonApi";
+import { useGetAllPokemonsQuery } from "../services/pokemonApi";
 import pokeballImage from "../assets/pokeball.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -35,31 +35,43 @@ const Pokedex = () => {
   const [search, setSearch] = useState("");
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [pageInput, setPageInput] = useState(String(page + 1));
-
   const [viewLegacy, setViewLegacy] = useState(false);
 
   const { favorites, toggleFavorite } = useFavorites();
 
-  const { data } = useGetPokemonsQuery({
-    limit: itemsPerPage,
-    offset: page * itemsPerPage,
-  });
+  const { data } = useGetAllPokemonsQuery({});
 
-  const totalPages = data?.count ? Math.ceil(data.count / itemsPerPage) : 0;
+  useEffect(() => {
+    setPage(0);
+  }, [search, showFavoritesOnly]);
 
   useEffect(() => {
     setPageInput(String(page + 1));
   }, [page]);
 
-  const filteredPokemons = data?.results.filter((pokemon: { name: string }) => {
-    const matchesSearch = pokemon.name
-      .toLowerCase()
-      .includes(search.toLowerCase());
-    if (showFavoritesOnly) {
-      return matchesSearch;
-    }
-    return matchesSearch;
-  });
+  const filteredList = data?.results
+    ? data.results.filter((pokemon: { name: string; url: string }) => {
+        const matchesSearch = pokemon.name
+          .toLowerCase()
+          .includes(search.toLowerCase());
+
+        if (showFavoritesOnly) {
+          const urlParts = pokemon.url.split("/");
+          const id = parseInt(urlParts[urlParts.length - 2]);
+
+          return matchesSearch && favorites.includes(id);
+        }
+
+        return matchesSearch;
+      })
+    : [];
+
+  const totalPages = Math.ceil(filteredList.length / itemsPerPage);
+
+  const paginatedPokemons = filteredList.slice(
+    page * itemsPerPage,
+    (page + 1) * itemsPerPage
+  );
 
   const handleLimitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setItemsPerPage(Number(e.target.value));
@@ -116,34 +128,28 @@ const Pokedex = () => {
       </Header>
       <Main>
         <PokemonGrid>
-          {showFavoritesOnly
-            ? favorites.map((id) => (
-                <PokemonCard
-                  key={id}
-                  pokemonIdentifier={id}
-                  favorites={favorites}
-                  toggleFavorite={toggleFavorite}
-                  showFavoritesOnly={showFavoritesOnly}
-                  viewLegacy={viewLegacy}
-                />
-              ))
-            : filteredPokemons?.map((poke: { name: string }) => (
-                <PokemonCard
-                  key={poke.name}
-                  pokemonIdentifier={poke.name}
-                  favorites={favorites}
-                  toggleFavorite={toggleFavorite}
-                  showFavoritesOnly={showFavoritesOnly}
-                  viewLegacy={viewLegacy}
-                />
-              ))}
+          {paginatedPokemons.map((poke: { name: string }) => (
+            <PokemonCard
+              key={poke.name}
+              pokemonIdentifier={poke.name}
+              favorites={favorites}
+              toggleFavorite={toggleFavorite}
+              showFavoritesOnly={showFavoritesOnly}
+              viewLegacy={viewLegacy}
+            />
+          ))}
+          {paginatedPokemons.length === 0 && (
+            <p style={{ color: "#fff", marginTop: "20px" }}>
+              Nenhum Pokémon encontrado.
+            </p>
+          )}
         </PokemonGrid>
       </Main>
       <Footer>
         <FooterContent>
           <FooterSection
             style={{
-              visibility: !showFavoritesOnly ? "visible" : "hidden",
+              visibility: filteredList.length > 0 ? "visible" : "hidden",
             }}
           >
             <span className="hide-mobile">Página</span>
@@ -159,9 +165,9 @@ const Pokedex = () => {
               onKeyDown={(e) => e.key === "Enter" && handleGoToPage()}
               onBlur={handleGoToPage}
               min="1"
-              max={totalPages}
+              max={totalPages || 1}
             />
-            <span className="hide-mobile">de {totalPages}</span>
+            <span className="hide-mobile">de {totalPages || 1}</span>
             <GoButton
               onClick={handleGoToPage}
               aria-label="Ir para página"
@@ -172,7 +178,7 @@ const Pokedex = () => {
           </FooterSection>
           <FooterSection
             style={{
-              visibility: !showFavoritesOnly ? "visible" : "hidden",
+              visibility: filteredList.length > 0 ? "visible" : "hidden",
             }}
           >
             <NavButton
@@ -183,8 +189,10 @@ const Pokedex = () => {
               <FontAwesomeIcon icon={faChevronLeft} aria-hidden="true" />
             </NavButton>
             <NavButton
-              onClick={() => (!data?.next ? null : setPage((old) => old + 1))}
-              disabled={!data?.next}
+              onClick={() =>
+                setPage((old) => (old + 1 < totalPages ? old + 1 : old))
+              }
+              disabled={page + 1 >= totalPages}
               aria-label="Avançar para próxima página"
             >
               <FontAwesomeIcon icon={faChevronRight} aria-hidden="true" />
@@ -192,14 +200,11 @@ const Pokedex = () => {
           </FooterSection>
           <FooterSection
             style={{
-              visibility: !showFavoritesOnly ? "visible" : "hidden",
+              visibility: filteredList.length > 0 ? "visible" : "hidden",
             }}
           >
             <label style={{ marginRight: "10px" }} className="hide-mobile">
               Pokémons por página:
-            </label>
-            <label htmlFor="itemsPerPage" className="sr-only">
-              Selecione quantos pokémons por página
             </label>
             <SelectInput
               id="itemsPerPage"
