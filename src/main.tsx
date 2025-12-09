@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
@@ -10,12 +10,12 @@ import PokemonDetail from "./pages/PokemonDetail.tsx";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           <Route path="/" element={<Pokedex />} />
           <Route path="/pokemon/:id" element={<PokemonDetail />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </Provider>
   </StrictMode>
 );
