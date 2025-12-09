@@ -38,7 +38,7 @@ const Pokedex = () => {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [pageInput, setPageInput] = useState(String(page + 1));
 
-  const [viewLegacy, setViewLegacy] = useState(() => {
+  const [viewLegacy, setViewLegacy] = useState<boolean>(() => {
     const stored = localStorage.getItem(VIEW_LEGACY_KEY);
     if (stored !== null) {
       return JSON.parse(stored);
