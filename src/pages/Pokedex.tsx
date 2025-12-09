@@ -29,17 +29,29 @@ import {
 import { useFavorites } from "../hooks/useFavorites";
 import PokemonCard from "./PokemonCard";
 
+const VIEW_LEGACY_KEY = "pokedex-view-legacy";
+
 const Pokedex = () => {
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(20);
   const [search, setSearch] = useState("");
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [pageInput, setPageInput] = useState(String(page + 1));
-  const [viewLegacy, setViewLegacy] = useState(false);
+
+  const [viewLegacy, setViewLegacy] = useState(() => {
+    const stored = localStorage.getItem(VIEW_LEGACY_KEY);
+    if (stored !== null) {
+      return JSON.parse(stored);
+    }
+    return false;
+  });
 
   const { favorites, toggleFavorite } = useFavorites();
-
   const { data } = useGetAllPokemonsQuery({});
+
+  useEffect(() => {
+    localStorage.setItem(VIEW_LEGACY_KEY, JSON.stringify(viewLegacy));
+  }, [viewLegacy]);
 
   useEffect(() => {
     setPage(0);
@@ -121,8 +133,17 @@ const Pokedex = () => {
           <FavoritesButton
             onClick={() => setViewLegacy((s) => !s)}
             aria-label="Mudar visualizaçao"
+            title={
+              viewLegacy
+                ? "Usar visualização nova"
+                : "Usar visualização clássica"
+            }
           >
-            <FontAwesomeIcon icon={faWandMagic} aria-hidden="true" />
+            <FontAwesomeIcon
+              icon={faWandMagic}
+              aria-hidden="true"
+              color={viewLegacy ? "#ffc300" : "#ddd"}
+            />
           </FavoritesButton>
         </SearchContainer>
       </Header>
